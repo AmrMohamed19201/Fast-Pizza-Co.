@@ -1,0 +1,29 @@
+[33mcommit 3cc4527ed2f7773c2dbd74433bcd8aae4a9c0ea0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: amr <amr.mohamed19201@gmail.com>
+Date:   Fri Jan 16 03:32:48 2026 +0200
+
+    displaying a loader indicator and handling errors using react router
+
+[33mcommit 5a0655661ba166a925e0bc4661c8250b506ef3ee[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: amr <amr.mohamed19201@gmail.com>
+Date:   Thu Jan 15 21:02:13 2026 +0200
+
+    Fetching Data With React Router Loaders: Pizza Menu
+
+[33mcommit 5ee24cf71936ca91da71f530c4ee38b858deb2b6[m
+Author: amr <amr.mohamed19201@gmail.com>
+Date:   Thu Jan 15 20:15:16 2026 +0200
+
+    building the app layout
+
+[33mcommit f4f6844e6ee29ee1ea19edafb4b4d023dbb67416[m
+Author: amr <amr.mohamed19201@gmail.com>
+Date:   Thu Jan 15 19:14:18 2026 +0200
+
+    implement app routing v6
+
+[33mcommit 1f0adf194a2046bebd9de098fd05a80faae276ed[m
+Author: amr <amr.mohamed19201@gmail.com>
+Date:   Thu Jan 15 18:07:15 2026 +0200
+
+    Initial commit

@@ -4,7 +4,9 @@ import Error from "./ui/Error";
 import Menu, { loader as menuLoader } from "./features/menu/Menu";
 import Cart from "./features/cart/Cart";
 import Order, { loader as orderLoader } from "./features/order/Order";
-import CreateOrder from "./features/order/CreateOrder";
+import CreateOrder, {
+  action as CreateOrderAction,
+} from "./features/order/CreateOrder";
 import AppLayout from "./ui/AppLayout";
 //using this method to implement app routing to also let react router control fetching data by using (render as you fetch approach) instead of (fetch on render approach) using useEffects(cause data loading waterfalls)
 const router = createBrowserRouter([
@@ -29,6 +31,7 @@ const router = createBrowserRouter([
       {
         path: "/order/new",
         element: <CreateOrder />,
+        action: CreateOrderAction, //call this function once user submit a form in this route
       },
       {
         path: "/order/:orderId",

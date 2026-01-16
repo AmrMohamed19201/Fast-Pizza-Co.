@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { createOrder } from "../../services/apiRestaurant";
+import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
@@ -33,12 +35,14 @@ const fakeCart = [
 function CreateOrder() {
   // const [withPriority, setWithPriority] = useState(false);
   const cart = fakeCart;
-
+  const formErrors = useActionData(); //get action function data to use in component
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
   return (
     <div>
       <h2>Ready to order? Let's go!</h2>
 
-      <form>
+      <Form method="POST">
         <div>
           <label>First Name</label>
           <input type="text" name="customer" required />
@@ -49,6 +53,7 @@ function CreateOrder() {
           <div>
             <input type="tel" name="phone" required />
           </div>
+          {formErrors?.phone && <p>{formErrors.phone}</p>}
         </div>
 
         <div>
@@ -70,11 +75,32 @@ function CreateOrder() {
         </div>
 
         <div>
-          <button>Order now</button>
+          {/*this input field to let formData contain also this fake cart to place it with user info in order */}
+          <input type="hidden" name="cart" value={JSON.stringify(cart)} />
+          <button disabled={isSubmitting}>
+            {isSubmitting ? "Placing order..." : "Order now"}
+          </button>
         </div>
-      </form>
+      </Form>
     </div>
   );
 }
-
+//this action function called by react router after user submit the form also from react router having a request object as an argument so we can get the data than user fill on form then create order object contain this data then send this order to api by create order function and wait to get this new order from api which has unique id of order so we can redirect to this order page (can't use useNavigate hook because this is not component so react router give us redirect method)
+export async function action({ request }) {
+  const formData = await request.formData();
+  const data = Object.fromEntries(formData);
+  const order = {
+    ...data,
+    cart: JSON.parse(data.cart),
+    priority: data.priority === "on",
+  };
+  const errors = {};
+  if (!isValidPhone(order.phone))
+    errors.phone =
+      "please give us your correct phone number. We might need to contact you";
+  if (Object.keys(errors).length > 0) return errors;
+  // if every thing is okay without error , create new order and redirect to it
+  const newOrder = await createOrder(order);
+  return redirect(`/order/${newOrder.id}`);
+}
 export default CreateOrder;

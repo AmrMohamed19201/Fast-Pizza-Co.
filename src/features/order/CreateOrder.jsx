@@ -2,6 +2,11 @@ import { createOrder } from "../../services/apiRestaurant";
 import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import Button from "../../ui/Button";
 import { useSelector } from "react-redux";
+import { clearCart, getCart, getTotalCartPrice } from "../cart/cartSlice";
+import EmptyCart from "../cart/EmptyCart";
+import store from "../../store";
+import { formatCurrency } from "../../utils/helpers";
+import { useState } from "react";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
@@ -9,38 +14,17 @@ const isValidPhone = (str) =>
     str,
   );
 
-const fakeCart = [
-  {
-    pizzaId: 12,
-    name: "Mediterranean",
-    quantity: 2,
-    unitPrice: 16,
-    totalPrice: 32,
-  },
-  {
-    pizzaId: 6,
-    name: "Vegetale",
-    quantity: 1,
-    unitPrice: 13,
-    totalPrice: 13,
-  },
-  {
-    pizzaId: 11,
-    name: "Spinach and Mushroom",
-    quantity: 1,
-    unitPrice: 15,
-    totalPrice: 15,
-  },
-];
-
 function CreateOrder() {
-  // const [withPriority, setWithPriority] = useState(false);
-  const cart = fakeCart;
+  const [withPriority, setWithPriority] = useState(false);
   const formErrors = useActionData(); //get action function data to use in component
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const username = useSelector((state) => state.user.username);
-
+  const cart = useSelector(getCart);
+  const totalCartPrice = useSelector(getTotalCartPrice);
+  const priorityPrice = withPriority ? totalCartPrice * 0.2 : 0;
+  const totalPrice = totalCartPrice + priorityPrice;
+  if (!cart.length) return <EmptyCart />; //can't go to new order page if cart is emptyS
   return (
     <div className="px-6 py-4">
       <h2 className="mb-8 text-xl font-semibold">Ready to order? Let's go!</h2>
@@ -87,8 +71,8 @@ function CreateOrder() {
             type="checkbox"
             name="priority"
             id="priority"
-            // value={withPriority}
-            // onChange={(e) => setWithPriority(e.target.checked)}
+            value={withPriority}
+            onChange={(e) => setWithPriority(e.target.checked)}
           />
           <label htmlFor="priority" className="font-medium">
             Want to yo give your order priority?
@@ -96,10 +80,12 @@ function CreateOrder() {
         </div>
 
         <div>
-          {/*this input field to let formData contain also this fake cart to place it with user info in order */}
+          {/*this input field to let formData contain also cart data to place it with user info in order (this way instead of getting redux data in action function)*/}
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
           <Button disabled={isSubmitting} type="primary">
-            {isSubmitting ? "Placing order..." : "Order now"}
+            {isSubmitting
+              ? "Placing order..."
+              : `Order now from ${formatCurrency(totalPrice)}`}
           </Button>
         </div>
       </Form>
@@ -113,7 +99,7 @@ export async function action({ request }) {
   const order = {
     ...data,
     cart: JSON.parse(data.cart),
-    priority: data.priority === "on",
+    priority: data.priority === "true", //true is value of state withPriority
   };
   const errors = {};
   if (!isValidPhone(order.phone))
@@ -122,6 +108,8 @@ export async function action({ request }) {
   if (Object.keys(errors).length > 0) return errors;
   // if every thing is okay without error , create new order and redirect to it
   const newOrder = await createOrder(order);
+  //this way of dispatching because in this action function (not component can not use useDispatch hook) but mustn't overuse this way bacause of performance optimization
+  store.dispatch(clearCart());
   return redirect(`/order/${newOrder.id}`);
 }
 export default CreateOrder;

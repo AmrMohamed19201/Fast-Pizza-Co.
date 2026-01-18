@@ -53,7 +53,7 @@ function CreateOrder() {
             name="customer"
             required
             className="input sm:grow"
-            defaultValuevalue={username}
+            defaultValue={username}
           />
         </div>
 

@@ -15,6 +15,7 @@ const userSlice = createSlice({
 });
 export const { updateName } = userSlice.actions; //for dispatch function in components
 export default userSlice.reducer; //for redux store
+export const getUser = (state) => state.cart.user; //selector function
 // function getPosition() {
 //   return new Promise(function (resolve, reject) {
 //     navigator.geolocation.getCurrentPosition(resolve, reject);

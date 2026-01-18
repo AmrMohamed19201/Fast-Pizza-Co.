@@ -1,11 +1,13 @@
 /* eslint-disable react/prop-types */
 import { formatCurrency } from "../../utils/helpers";
 import Button from "../../ui/Button";
-import { useDispatch } from "react-redux";
-import { addItem } from "../cart/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { addItem, getCart } from "../cart/cartSlice";
+import DeleteItem from "../cart/DeleteItem";
 function MenuItem({ pizza }) {
   const dispatch = useDispatch();
   const { id, name, unitPrice, ingredients, soldOut, imageUrl } = pizza;
+  const cart = useSelector(getCart);
   //adding pizza to cart
   function handleAddToCart() {
     const newItem = {
@@ -17,6 +19,7 @@ function MenuItem({ pizza }) {
     };
     dispatch(addItem(newItem));
   }
+  const isItemInCart = cart.some((item) => item.pizzaId === id);
   return (
     <li className="flex py-2 gap-4 items-center">
       <img
@@ -37,11 +40,14 @@ function MenuItem({ pizza }) {
               Sold out
             </p>
           )}
-          {!soldOut && (
-            <Button type="small" onClick={handleAddToCart}>
-              add to cart
-            </Button>
-          )}
+          {!soldOut &&
+            (isItemInCart ? (
+              <DeleteItem pizzaId={id} />
+            ) : (
+              <Button type="small" onClick={handleAddToCart}>
+                add to cart
+              </Button>
+            ))}
         </div>
       </div>
     </li>

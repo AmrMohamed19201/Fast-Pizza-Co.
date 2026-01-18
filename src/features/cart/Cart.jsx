@@ -9,20 +9,6 @@ function Cart() {
   const username = useSelector(getUser);
   const cart = useSelector(getCart);
   const dispatch = useDispatch();
-  /*
-  const aggregatedCart = cart.reduce((acc, item) => {
-    const existing = acc.find((el) => el.pizzaId === item.pizzaId);
-
-    if (existing) {
-      existing.quantity++;
-      existing.totalPrice = existing.unitPrice * existing.quantity;
-    } else {
-      acc.push({ ...item });
-    }
-
-    return acc;
-  }, []);
-  */
   if (!cart.length) return <EmptyCart />;
   return (
     <div className="px-4 py-3">

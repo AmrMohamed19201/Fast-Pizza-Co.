@@ -7,6 +7,7 @@ import Order, { loader as orderLoader } from "./features/order/Order";
 import CreateOrder, {
   action as CreateOrderAction,
 } from "./features/order/CreateOrder";
+import { action as updateOrderAction } from "./features/order/UpdateOrder";
 import AppLayout from "./ui/AppLayout";
 //using this method to implement app routing to also let react router control fetching data by using (render as you fetch approach) instead of (fetch on render approach) using useEffects(cause data loading waterfalls)
 const router = createBrowserRouter([
@@ -38,6 +39,7 @@ const router = createBrowserRouter([
         element: <Order />,
         loader: orderLoader,
         errorElement: <Error />,
+        action: updateOrderAction, //can connect action function with this component in this route or any other child component (such as updateOrder in this case)
       },
     ],
   },

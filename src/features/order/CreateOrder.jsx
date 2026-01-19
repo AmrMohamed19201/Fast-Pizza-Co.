@@ -1,12 +1,13 @@
 import { createOrder } from "../../services/apiRestaurant";
 import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import Button from "../../ui/Button";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { clearCart, getCart, getTotalCartPrice } from "../cart/cartSlice";
 import EmptyCart from "../cart/EmptyCart";
 import store from "../../store";
 import { formatCurrency } from "../../utils/helpers";
 import { useState } from "react";
+import { fetchAddress } from "../user/userSlice";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
@@ -19,16 +20,23 @@ function CreateOrder() {
   const formErrors = useActionData(); //get action function data to use in component
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
-  const username = useSelector((state) => state.user.username);
+  const {
+    username,
+    status: addressStatus,
+    position,
+    error: addressError,
+    address,
+  } = useSelector((state) => state.user);
+  const isLoading = addressStatus === "loading";
   const cart = useSelector(getCart);
   const totalCartPrice = useSelector(getTotalCartPrice);
   const priorityPrice = withPriority ? totalCartPrice * 0.2 : 0;
   const totalPrice = totalCartPrice + priorityPrice;
+  const dispatch = useDispatch();
   if (!cart.length) return <EmptyCart />; //can't go to new order page if cart is emptyS
   return (
     <div className="px-6 py-4">
       <h2 className="mb-8 text-xl font-semibold">Ready to order? Let's go!</h2>
-
       <Form method="POST">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center mb-5">
           <label className="sm:basis-40">First Name</label>
@@ -55,13 +63,34 @@ function CreateOrder() {
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center mb-5">
           <label className="sm:basis-40">Address</label>
-          <div className="sm:grow">
+          <div className="sm:grow relative">
             <input
+              disabled={isLoading}
               type="text"
               name="address"
               required
               className="input w-full"
+              defaultValue={address}
             />
+            {!position.latitude && !position.longitude && (
+              <span className="absolute right-[3px] top-[3px] z-50 md:right-[5px] md:top-[5px]">
+                <Button
+                  disabled={isLoading}
+                  type="small"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    dispatch(fetchAddress());
+                  }}
+                >
+                  get geoloaction
+                </Button>
+              </span>
+            )}
+            {addressStatus === "error" && (
+              <p className="rounded-md bg-red-100 text-red-700 text-xs p-2 mt-2">
+                {addressError}
+              </p>
+            )}
           </div>
         </div>
 
@@ -82,6 +111,15 @@ function CreateOrder() {
         <div>
           {/*this input field to let formData contain also cart data to place it with user info in order (this way instead of getting redux data in action function)*/}
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
+          <input
+            type="hidden"
+            name="position"
+            value={
+              position.latitude && position.longitude
+                ? `${position.latitude},${position.longitude}`
+                : ""
+            }
+          />
           <Button disabled={isSubmitting} type="primary">
             {isSubmitting
               ? "Placing order..."

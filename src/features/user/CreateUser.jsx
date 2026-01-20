@@ -1,8 +1,11 @@
-import { useState } from "react";
-import Button from "../../ui/Button";
-import { useDispatch } from "react-redux";
-import { updateName } from "./userSlice";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useState } from "react";
+
+import Button from "../../ui/Button";
+
+import { updateName } from "./userSlice";
+
 function CreateUser() {
   const [username, setUsername] = useState("");
   const dispatch = useDispatch();
@@ -19,7 +22,6 @@ function CreateUser() {
       <p className="text-sm mb-4 text-stone-600 md:text-base">
         👋 Welcome! Please start by telling us your name:
       </p>
-
       <input
         type="text"
         placeholder="Your full name"
@@ -27,7 +29,6 @@ function CreateUser() {
         onChange={(e) => setUsername(e.target.value)}
         className="input w-72 mb-8"
       />
-
       {username !== "" && (
         <div>
           <Button type="primary">Start ordering</Button>

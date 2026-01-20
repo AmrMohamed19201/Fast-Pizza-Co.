@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+
 import { getAddress } from "../../services/apiGeocoding";
+
 function getPosition() {
   return new Promise(function (resolve, reject) {
     navigator.geolocation.getCurrentPosition(resolve, reject);
@@ -19,10 +21,12 @@ export const fetchAddress = createAsyncThunk(
     // 2) Then we use a reverse geocoding API to get a description of the user's address, so we can display it the order form, so that the user can correct it if wrong
     const addressObj = await getAddress(position);
     const address = `${addressObj?.locality}, ${addressObj?.city} ${addressObj?.postcode}, ${addressObj?.countryName}`;
+
     // 3) Then we return an object with the data that we are interested in
     return { position, address };
   },
 );
+
 const initialState = {
   username: "",
   status: "idle",
@@ -30,6 +34,7 @@ const initialState = {
   address: "",
   error: "",
 };
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -54,6 +59,9 @@ const userSlice = createSlice({
           "There was a problem getting your address. Make sure to fill this feild!";
       }),
 });
+
 export const { updateName } = userSlice.actions; //for dispatch function in components
+
 export default userSlice.reducer; //for redux store
+
 export const getUser = (state) => state.user.username; //selector function

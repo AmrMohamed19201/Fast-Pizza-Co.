@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   cart: [],
 };
+
 const cartSlice = createSlice({
   name: "cart",
   initialState,
@@ -26,13 +27,14 @@ const cartSlice = createSlice({
       const item = state.cart.find((item) => item.pizzaId === action.payload);
       item.quantity--;
       item.totalPrice = item.unitPrice * item.quantity;
-      if (item.quantity === 0) cartSlice.caseReducers.deleteItem(state, action); //this way insted to write the logic of action function in her slice again
+      if (item.quantity === 0) cartSlice.caseReducers.deleteItem(state, action); //this way do dispatch inside the state slice(can't use dispatch(deleteItem))
     },
     clearCart(state) {
       state.cart = [];
     },
   },
 });
+
 export const {
   addItem,
   deleteItem,
@@ -40,12 +42,14 @@ export const {
   decreaseItemQuantity,
   clearCart,
 } = cartSlice.actions;
+
 export default cartSlice.reducer;
-//best practice to let selectors functions here
+
+//best practice to let selectors functions here(pass these selector functions to useSelector hook to get these data)
+export const getCart = (state) => state.cart.cart;
 export const getTotalCartQuantity = (state) =>
   state.cart.cart.reduce((sum, item) => sum + item.quantity, 0);
 export const getTotalCartPrice = (state) =>
   state.cart.cart.reduce((sum, item) => sum + item.totalPrice, 0);
-export const getCart = (state) => state.cart.cart;
 export const getCurrentQuantityById = (id) => (state) =>
   state.cart.cart.find((item) => item.pizzaId === id)?.quantity ?? 0;
